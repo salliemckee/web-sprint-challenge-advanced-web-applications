@@ -36,7 +36,7 @@ export default function App() {
     // using the helper above.
 
     window.localStorage.removeItem("token");
-    setMessage({ ...message, message: "Goodbye!" });
+    setMessage("Goodbye!");
     redirectToLogin();
   };
 
@@ -52,6 +52,7 @@ export default function App() {
       .then((res) => {
         console.log(res.data);
         const token = res.data.token;
+        setMessage(res.data.message);
         window.localStorage.setItem("token", token);
         navigate("./articles");
       })
@@ -91,7 +92,7 @@ export default function App() {
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
       <Spinner />
-      <Message />
+      <Message message={message} />
       <button id="logout" onClick={logout}>
         Logout from app
       </button>
