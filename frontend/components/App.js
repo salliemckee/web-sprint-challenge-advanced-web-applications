@@ -80,18 +80,14 @@ export default function App() {
     axiosWithAuth()
       .get(articlesUrl)
       .then((res) => {
-        console.log(res.data.articles);
-        if (res.status === 200) {
-          setArticles(res.data.articles);
-          setMessage(res.data.message);
-          setSpinnerOn(false);
-        } else {
-          redirectToLogin();
-        }
+        setArticles(res.data.articles);
+        setMessage(res.data.message);
+        setSpinnerOn(false);
+
         // debugger;
       })
       .catch((err) => {
-        debugger;
+        console.log(err);
       });
   };
 
