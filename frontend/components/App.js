@@ -110,9 +110,18 @@ export default function App() {
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    axiosWithAuth()
+      .put(`${articlesUrl}/${article_id}`, article)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        debugger;
+      });
   };
 
   const deleteArticle = (article_id) => {
+    console.log(article_id);
     // ✨ implement
     axiosWithAuth()
       .delete(`${articlesUrl}/${article_id}`)
@@ -120,7 +129,7 @@ export default function App() {
         setMessage(res.data.message);
         setArticles(
           articles.filter((art) => {
-            return !art.article_id === article_id;
+            return art.article_id !== article_id;
           })
         );
       })
@@ -160,6 +169,7 @@ export default function App() {
                   getArticles={getArticles}
                   articles={articles}
                   deleteArticle={deleteArticle}
+                  updateArticle={updateArticle}
                 />
               </>
             }
