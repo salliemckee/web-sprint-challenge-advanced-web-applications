@@ -6,6 +6,7 @@ import Message from "./Message";
 import ArticleForm from "./ArticleForm";
 import Spinner from "./Spinner";
 import axios from "axios";
+import axiosWithAuth from "../axios";
 
 const articlesUrl = "http://localhost:9000/api/articles";
 const loginUrl = "http://localhost:9000/api/login";
@@ -47,6 +48,9 @@ export default function App() {
     // On success, we should set the token to local storage in a 'token' key,
     // put the server success message in its proper state, and redirect
     // to the Articles screen. Don't forget to turn off the spinner!
+    setMessage();
+    setSpinnerOn(true);
+
     axios
       .post(loginUrl, { username, password })
       .then((res) => {
@@ -54,7 +58,8 @@ export default function App() {
         const token = res.data.token;
         setMessage(res.data.message);
         window.localStorage.setItem("token", token);
-        navigate("./articles");
+        redirectToArticles();
+        setSpinnerOn(false);
       })
       .catch((err) => {
         debugger;
@@ -70,6 +75,17 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
+    axiosWithAuth()
+      .get(articlesUrl)
+      .then((res) => {
+        console.log(res);
+        setArticles(res.data.articles);
+        setMessage(res.data.message);
+        // debugger;
+      })
+      .catch((err) => {
+        debugger;
+      });
   };
 
   const postArticle = (article) => {
@@ -91,7 +107,7 @@ export default function App() {
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
-      <Spinner />
+      <Spinner on={spinnerOn} />
       <Message message={message} />
       <button id="logout" onClick={logout}>
         Logout from app
@@ -115,7 +131,7 @@ export default function App() {
             element={
               <>
                 <ArticleForm />
-                <Articles />
+                <Articles getArticles={getArticles} />
               </>
             }
           />
