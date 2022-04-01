@@ -54,7 +54,6 @@ export default function App() {
     axios
       .post(loginUrl, { username, password })
       .then((res) => {
-        console.log(res.data);
         const token = res.data.token;
         setMessage(res.data.message);
         window.localStorage.setItem("token", token);
@@ -75,12 +74,20 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
+    setMessage();
+    setSpinnerOn(true);
+
     axiosWithAuth()
       .get(articlesUrl)
       .then((res) => {
-        console.log(res);
-        setArticles(res.data.articles);
-        setMessage(res.data.message);
+        console.log(res.data.articles);
+        if (res.status === 200) {
+          setArticles(res.data.articles);
+          setMessage(res.data.message);
+          setSpinnerOn(false);
+        } else {
+          redirectToLogin();
+        }
         // debugger;
       })
       .catch((err) => {
@@ -93,6 +100,15 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+    axiosWithAuth()
+      .post(articlesUrl, article)
+      .then((res) => {
+        console.log(res);
+        debugger;
+      })
+      .catch((err) => {
+        debugger;
+      });
   };
 
   const updateArticle = ({ article_id, article }) => {
@@ -102,6 +118,19 @@ export default function App() {
 
   const deleteArticle = (article_id) => {
     // ✨ implement
+    axiosWithAuth()
+      .delete(`${articlesUrl}/${article_id}`)
+      .then((res) => {
+        setMessage(res.data.message);
+        setArticles(
+          articles.filter((art) => {
+            return !art.article_id === article_id;
+          })
+        );
+      })
+      .catch((err) => {
+        debugger;
+      });
   };
 
   return (
@@ -131,7 +160,11 @@ export default function App() {
             element={
               <>
                 <ArticleForm />
-                <Articles getArticles={getArticles} />
+                <Articles
+                  getArticles={getArticles}
+                  articles={articles}
+                  deleteArticle={deleteArticle}
+                />
               </>
             }
           />

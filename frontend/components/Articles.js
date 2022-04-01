@@ -22,9 +22,9 @@ export default function Articles(props) {
     // and use the articles prop to generate articles
     <div className="articles">
       <h2>Articles</h2>
-      {![].length
+      {!articles.length
         ? "No articles yet"
-        : [].map((art) => {
+        : articles.map((art) => {
             return (
               <div className="article" key={art.article_id}>
                 <div>
@@ -36,7 +36,10 @@ export default function Articles(props) {
                   <button disabled={true} onClick={Function.prototype}>
                     Edit
                   </button>
-                  <button disabled={true} onClick={Function.prototype}>
+                  <button
+                    disabled={true}
+                    onClick={(evt) => deleteArticle(art.article_id)}
+                  >
                     Delete
                   </button>
                 </div>
