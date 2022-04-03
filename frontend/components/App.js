@@ -15,8 +15,9 @@ export default function App() {
   // ✨ MVP can be achieved with these states
   const [message, setMessage] = useState("");
   const [articles, setArticles] = useState([]);
-  const [currentArticleId, setCurrentArticleId] = useState();
+  const [currentArticle, setCurrentArticle] = useState(null);
   const [spinnerOn, setSpinnerOn] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ export default function App() {
       });
   };
 
-  const getArticles = () => {
+  const getArticles = (message = null) => {
     // ✨ implement
     // We should flush the message state, turn on the spinner
     // and launch an authenticated request to the proper endpoint.
@@ -81,7 +82,11 @@ export default function App() {
       .get(articlesUrl)
       .then((res) => {
         setArticles(res.data.articles);
-        setMessage(res.data.message);
+        if (message) {
+          setMessage(message);
+        } else {
+          setMessage(res.data.message);
+        }
         setSpinnerOn(false);
 
         // debugger;
@@ -92,6 +97,8 @@ export default function App() {
   };
 
   const postArticle = (article) => {
+    setMessage();
+    setSpinnerOn(true);
     // ✨ implement
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
@@ -99,25 +106,32 @@ export default function App() {
     axiosWithAuth()
       .post(articlesUrl, article)
       .then((res) => {
-        console.log(res);
-        debugger;
+        getArticles(res.data.message);
       })
       .catch((err) => {
-        debugger;
+        setSpinnerOn(false);
+        console.log(err);
       });
   };
 
-  const updateArticle = ({ article_id, article }) => {
+  const updateArticle = (article) => {
+    setMessage();
+    setSpinnerOn(true);
     // ✨ implement
     // You got this!
     axiosWithAuth()
-      .put(`${articlesUrl}/${article_id}`, article)
+      .put(`${articlesUrl}/${article.article_id}`, article)
       .then((res) => {
-        console.log(res);
+        getArticles(res.data.message);
       })
       .catch((err) => {
-        debugger;
+        setSpinnerOn(false);
+        console.log(err);
       });
+  };
+
+  const editArticle = (art) => {
+    setCurrentArticle(art);
   };
 
   const deleteArticle = (article_id) => {
@@ -164,12 +178,20 @@ export default function App() {
             path="articles"
             element={
               <>
-                <ArticleForm />
+                <ArticleForm
+                  editMode={editMode}
+                  setEditMode={setEditMode}
+                  currentArticle={currentArticle}
+                  postArticle={postArticle}
+                  updateArticle={updateArticle}
+                />
                 <Articles
+                  editMode={editMode}
+                  setEditMode={setEditMode}
                   getArticles={getArticles}
                   articles={articles}
                   deleteArticle={deleteArticle}
-                  updateArticle={updateArticle}
+                  editArticle={editArticle}
                 />
               </>
             }
